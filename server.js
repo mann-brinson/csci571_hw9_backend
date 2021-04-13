@@ -354,6 +354,69 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
 
 })
 
+//// SEARCH PAGE
+app.get('/apis/search/:terms', function (req, res) {
+    //Get query params
+    terms = req.params.terms
+
+    //Build request
+    url_search = `https://api.themoviedb.org/3/search/multi?api_key=${api_key}&language=en-US&query=${terms}`
+    requests = []
+    req = buildReq(url_search)
+    requests.push(req)
+
+    //// PARSING FUNCTIONS
+    function parseSearchResults(obj) {
+        var result = []
+
+        if (obj.total_results == 0) {
+            return "no results found"
+        } else (
+            obj.results.forEach((s_result, i) => {
+
+                if (i < 7) { //Show only the top 7 records
+                    record = {}
+
+                    record["id"] = s_result.id
+                    record["media_type"] = s_result.media_type
+                    record["rating"] = Math.round((s_result.vote_average / 2) * 10) / 10
+
+                    if (s_result.media_type == "tv") {
+                        record["name"] = s_result.name
+                        record["year"] = s_result.first_air_date.split('-')[0]
+                    } else if (s_result.media_type == "movie") {
+                        record["name"] = s_result.title
+                        record["year"] = s_result.release_date.split('-')[0]
+                    }
+
+                    if (s_result.backdrop_path == null) {
+                        record["backdrop_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW6/imgs/movie-placeholder.jpg"
+                    } else {
+                        record["backdrop_path"] = "https://image.tmdb.org/t/p/original" + s_result.backdrop_path
+                    }
+                    result.push(record)
+                }
+            })
+        )
+        return result
+    }
+
+    axios.all(requests).then(axios.spread((...responses) => {
+        //Parse desired features from each response
+        var output = {}
+
+        obj = responses[0].data
+
+        // SEARCH RESULTS
+        result = parseSearchResults(obj)
+        res.send(result)
+
+      })).catch(errors => {
+        // react on errors.
+      })
+
+})
+
 
 // Define port and listen on the port
 const PORT = process.env.PORT || 8080
