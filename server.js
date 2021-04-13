@@ -414,9 +414,8 @@ app.get('/apis/search/:terms', function (req, res) {
       })).catch(errors => {
         // react on errors.
       })
-
+    
 })
-
 
 // Define port and listen on the port
 const PORT = process.env.PORT || 8080
