@@ -209,7 +209,7 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
         result["genres"] = obj.genres.map(item => item.name)
         result["spoken_languages"] = obj.spoken_languages.map(item => item.english_name)
         result["overview"] = obj.overview
-        result["vote_average"] = obj.vote_average
+        result["vote_average"] = Math.round((obj.vote_average / 2) * 10) / 10
         return result
     }
 
@@ -256,7 +256,6 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                 }
                 result.push(record)
             }
-        
         })
         return result
     }
@@ -275,7 +274,7 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                 if (review.author_details.rating == null) {
                     record["rating"] = 0
                 } else {
-                    record["rating"] = Math.round(review.author_details.rating)
+                    record["rating"] = Math.round((review.author_details.rating / 2) * 10) / 10
                 }
     
                 result.push(record)
@@ -283,7 +282,6 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
         })
         return result
     }
-
 
     // RECOMMENDED
     function parseRecommended(obj, entity) {
