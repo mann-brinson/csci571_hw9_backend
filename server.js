@@ -91,8 +91,8 @@ app.get('/apis/home/:entity', function(req, res) {
     request_head = buildReq(url_head)
     requests.push(request_head) //IMPORTANT: The last request is for head
 
-    // console.log({"head_url": url_head})
-    // console.log({"body_urls": url_list})
+    console.log({"head_url": url_head})
+    console.log({"body_urls": url_list})
 
     //Send requests asynchronously, then process all responses
     axios.all(requests).then(axios.spread((...responses) => {
@@ -119,11 +119,9 @@ app.get('/apis/home/:entity', function(req, res) {
                 //Associate the list_type with the extracted movies/tv_shows
                 var obj_list = new Object()
                 obj_list[list_type] = movie_list_extracted
-                if (!(entity_type in output)) {
-                    // output[entity_type] = [obj_list]
+                if (!('body' in output)) {
                     output['body'] = [obj_list]
                 } else {
-                    // output[entity_type].push(obj_list)
                     output['body'].push(obj_list)
                 }
             }
@@ -152,9 +150,13 @@ app.get('/apis/home/:entity', function(req, res) {
     })).catch(errors => {
         // react on errors.
     })
-
-    
 })
+
+//// DETAILS PAGE
+// app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
+//     res.send("Hello world")
+    
+// }
 
 // Define port and listen on the port
 const PORT = process.env.PORT || 8080
