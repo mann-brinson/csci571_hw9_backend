@@ -107,6 +107,7 @@ app.get('/apis/home/:entity', function(req, res) {
         //For each response, for each movie object, parse out the desired features
         // based on list_type (ex: "now_playing", "trending", ...)
         var output = {}
+        output["body"] = {}
 
         //// BODY-LISTS
         responses.forEach((response, i) => {
@@ -124,13 +125,7 @@ app.get('/apis/home/:entity', function(req, res) {
                 })
                 
                 //Associate the list_type with the extracted movies/tv_shows
-                var obj_list = new Object()
-                obj_list[list_type] = movie_list_extracted
-                if (!('body' in output)) {
-                    output['body'] = [obj_list]
-                } else {
-                    output['body'].push(obj_list)
-                }
+                output["body"][list_type] = movie_list_extracted
             }
         //// HEAD-LIST
         head_resp = responses[responses.length-1]
