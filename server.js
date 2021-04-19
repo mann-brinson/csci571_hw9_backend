@@ -294,9 +294,11 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                     if (entity == "movie") {
                         record["name"] = item.title
                         record["entity_type"] = "movie"
+                        record["year"] = item.release_date.split('-')[0]
                     } else {
                         record["name"] = item.name
                         record["entity_type"] = "tv"
+                        record["year"] = item.first_air_date.split('-')[0]
                     }
     
                     if (item.poster_path == null) {
