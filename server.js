@@ -71,12 +71,13 @@ app.get('/apis/home/:entity', function(req, res) {
         var result = {}
         result["id"] = obj.id
         result["entity_type"] = entity_type
-        // result["test"] = "test"
 
         if (entity_type == "movie") {
             result["name"] = obj.title
+            result["year"] = obj.release_date.split('-')[0]
         } else {
             result["name"] = obj.name
+            result["year"] = obj.first_air_date.split('-')[0]
         }
 
         //Extract backdrop_path for the "now_playing" movies
