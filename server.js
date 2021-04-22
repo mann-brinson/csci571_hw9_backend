@@ -170,9 +170,13 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
     url_reviews = `${url_root}${entity}/${tmdb_id}/reviews?api_key=${api_key}`
     url_recommended = `${url_root}${entity}/${tmdb_id}/recommendations?api_key=${api_key}`
 
+    
+
     urls = [["detail", url_detail], ["video", url_video],
             ["credits", url_credits], ["reviews", url_reviews],
             ["recommended", url_recommended]]
+
+    console.log({"getting this url: ": urls})
 
     requests = []
     urls.forEach((url) => {
@@ -186,12 +190,12 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
         var result = {}
         if (entity == "movie") {
             result["name"] = obj.title
-            result["release_date"] = obj.release_date
+            result["year"] = obj.release_date.split('-')[0]
             result["runtime"] = obj.runtime
         } 
         else {
             result["name"] = obj.name
-            result["first_air_date"] = obj.first_air_date
+            result["year"] = obj.first_air_date.split('-')[0]
             result["runtime"] = obj.episode_run_time[0]
         }
         if (obj.poster_path == null) {
@@ -202,10 +206,12 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
         }
 
         result["tmdb_id"] = obj.id
-        result["genres"] = obj.genres.map(item => item.name)
+        result["entity_type"] = entity
+        let genres_list = obj.genres.map(item => item.name)
+        result["genres"] = genres_list.join(', ')
         result["spoken_languages"] = obj.spoken_languages.map(item => item.english_name)
         result["overview"] = obj.overview
-        result["vote_average"] = Math.round((obj.vote_average / 2) * 10) / 10
+        result["vote_average"] = (Math.round((obj.vote_average / 2) * 10) / 10).toString()
         return result
     }
 
@@ -294,11 +300,22 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                     if (entity == "movie") {
                         record["name"] = item.title
                         record["entity_type"] = "movie"
-                        record["year"] = item.release_date.split('-')[0]
+                        if (item.release_date) {
+                            record["year"] = item.release_date.split('-')[0]
+                        } else {
+                            record["year"] = ""
+                        }
+                        
                     } else {
                         record["name"] = item.name
                         record["entity_type"] = "tv"
-                        record["year"] = item.first_air_date.split('-')[0]
+
+                        if (item.first_air_date) {
+                            record["year"] = item.first_air_date.split('-')[0]
+                        } else {
+                            record["year"] = ""
+                        }
+                        
                     }
     
                     if (item.poster_path == null) {
