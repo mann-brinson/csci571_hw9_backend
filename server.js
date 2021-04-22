@@ -268,9 +268,15 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
         obj.results.forEach((review, i) => {
             if (i < 3) { //Grab only the top 3 reviews
                 var record = {}
+                record["id"] = review.id
                 record["author"] = review.author
                 record["content"] = review.content
-                record["created_at"] = review.created_at
+
+                var date_raw = new Date(review.created_at)
+                let formatted_date = `${date_raw.toLocaleString('default', { month: 'short' })} ${date_raw.getDate()}, ${date_raw.getFullYear()}`
+                record["created_at"] = formatted_date
+
+                console.log(review.created_at)
                 record["url"] = review.url
     
                 if (review.author_details.rating == null) {
