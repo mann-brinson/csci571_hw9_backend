@@ -269,7 +269,7 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
             if (i < 3) { //Grab only the top 3 reviews
                 var record = {}
                 record["id"] = review.id
-                record["author"] = review.author
+                record["username"] = review.author_details.username
                 record["content"] = review.content
 
                 var date_raw = new Date(review.created_at)
@@ -280,9 +280,9 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                 record["url"] = review.url
     
                 if (review.author_details.rating == null) {
-                    record["rating"] = 0
+                    record["rating"] = "0"
                 } else {
-                    record["rating"] = Math.round((review.author_details.rating / 2) * 10) / 10
+                    record["rating"] = (Math.round((review.author_details.rating / 2) * 10) / 10).toFixed(1)
                 }
     
                 result.push(record)
@@ -304,8 +304,9 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                     record["id"] = item.id
         
                     if (entity == "movie") {
-                        record["name"] = item.title
                         record["entity_type"] = "movie"
+                        record["name"] = item.title
+                        
                         if (item.release_date) {
                             record["year"] = item.release_date.split('-')[0]
                         } else {
@@ -313,8 +314,8 @@ app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
                         }
                         
                     } else {
-                        record["name"] = item.name
                         record["entity_type"] = "tv"
+                        record["name"] = item.name
 
                         if (item.first_air_date) {
                             record["year"] = item.first_air_date.split('-')[0]
@@ -395,27 +396,37 @@ app.get('/apis/search/:terms', function (req, res) {
         } else (
             obj.results.forEach((s_result, i) => {
 
-                if (i < 7) { //Show only the top 7 records
+                if (i < 20) { //Show only the top 7 records
                     record = {}
 
-                    record["id"] = s_result.id
-                    record["media_type"] = s_result.media_type
-                    record["rating"] = Math.round((s_result.vote_average / 2) * 10) / 10
-
-                    if (s_result.media_type == "tv") {
-                        record["name"] = s_result.name
-                        record["year"] = s_result.first_air_date.split('-')[0]
-                    } else if (s_result.media_type == "movie") {
-                        record["name"] = s_result.title
-                        record["year"] = s_result.release_date.split('-')[0]
-                    }
-
-                    if (s_result.backdrop_path == null) {
-                        record["backdrop_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW6/imgs/movie-placeholder.jpg"
-                    } else {
+                    // Only show a result if the backdrop path is present (Piazza confirmed)
+                    if (s_result.backdrop_path != null) {
                         record["backdrop_path"] = "https://image.tmdb.org/t/p/original" + s_result.backdrop_path
+
+                        record["id"] = s_result.id
+                        record["media_type"] = s_result.media_type
+                        record["rating"] = (Math.round((s_result.vote_average / 2) * 10) / 10).toFixed(1)
+    
+                        if (s_result.media_type == "tv") {
+                            record["name"] = s_result.name
+                            record["year"] = s_result.first_air_date.split('-')[0]
+                        } else if (s_result.media_type == "movie") {
+                            record["name"] = s_result.title
+                            record["year"] = s_result.release_date.split('-')[0]
+                        }
+
+                        result.push(record)
                     }
-                    result.push(record)
+                    
+
+
+
+                    // if (s_result.backdrop_path == null) {
+                    //     record["backdrop_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW6/imgs/movie-placeholder.jpg"
+                    // } else {
+                    //     record["backdrop_path"] = "https://image.tmdb.org/t/p/original" + s_result.backdrop_path
+                    // }
+                    
                 }
             })
         )
